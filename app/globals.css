@@ -1,0 +1,251 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Inter:wght@400;500;600&display=swap");
+
+/* Tokens de design — mesma linguagem visual do protótipo HTML (Anexo do PRD).
+   Paleta institucional/gazeta: navy + papel + vermelho-carimbo + dourado + verde-teal. */
+:root {
+  --paper: #f2f0e9;
+  --ink: #1e2a38;
+  --ink-soft: #4b5768;
+  --line: #d8d3c4;
+  --stamp: #a8412c;
+  --stamp-soft: #f0ded8;
+  --gold: #b08a3e;
+  --gold-soft: #f1e9d4;
+  --teal: #2f6b5e;
+  --teal-soft: #deeae6;
+  --white: #fbfaf6;
+  --font-serif: "Source Serif 4", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+.app-shell {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--white);
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.brand {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+}
+
+.brand span {
+  color: var(--stamp);
+}
+
+main {
+  flex: 1;
+  padding: 28px 24px 40px;
+}
+
+h1 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.25;
+  margin: 0 0 8px;
+}
+
+.lede {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  margin: 0 0 28px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 20px;
+  border-radius: 3px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.field {
+  margin-bottom: 18px;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 7px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--white);
+}
+
+.error {
+  font-size: 12px;
+  color: var(--stamp);
+  margin-top: 6px;
+}
+
+.consent-box {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 16px;
+  background: var(--paper);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin-bottom: 20px;
+}
+
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.sla-banner {
+  background: var(--stamp-soft);
+  color: var(--stamp);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 24px;
+  text-align: center;
+}
+
+.sector-pill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--teal);
+  background: var(--teal-soft);
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 16px;
+  margin-bottom: 14px;
+  background: var(--white);
+  display: block;
+  text-decoration: none;
+}
+
+.card h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+
+.card .meta {
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-right: 6px;
+}
+
+.badge.legal {
+  background: var(--stamp-soft);
+  color: var(--stamp);
+}
+
+.badge.fundo {
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+
+.alert-detail {
+  border: 1.5px solid var(--stamp);
+  border-radius: 5px;
+  padding: 20px;
+  background: var(--white);
+}
+
+.hedge {
+  margin-top: 18px;
+  padding: 14px;
+  background: var(--paper);
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.disclaimer {
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-align: center;
+  padding: 16px 24px 28px;
+  line-height: 1.6;
+  border-top: 1px solid var(--line);
+}
