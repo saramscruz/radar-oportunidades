@@ -77,19 +77,19 @@ export default function ConvitePage() {
           </div>
         </div>
 
-        {/* Três funcionalidades, com ícone dentro de círculo — igual ao produto ao vivo */}
+        {/* Três funcionalidades, com ícone dentro de círculo — agora
+            genuinamente clicáveis (levam a /setores), não só decorativas */}
         <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 32 }}>
           {features.map((f) => (
-            <div
+            <Link
               key={f.title}
+              href="/setores"
+              className="card"
               style={{
                 display: "flex",
                 alignItems: "flex-start",
                 gap: 14,
                 padding: 16,
-                borderRadius: 8,
-                border: "1px solid var(--border)",
-                background: "var(--bg-card)",
               }}
             >
               <div
@@ -116,14 +116,36 @@ export default function ConvitePage() {
                   {f.body}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
         <h3 className="section-title" style={{ marginTop: 0 }}>
           Um exemplo real do feed
         </h3>
-        <div className="card" style={{ cursor: "default" }}>
+        <div
+          className="card"
+          style={{
+            cursor: "default",
+            border: "1px dashed var(--border-strong)",
+            background: "transparent",
+            position: "relative",
+          }}
+        >
+          <span
+            style={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              fontSize: 9,
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.04em",
+              color: "var(--text-muted)",
+            }}
+          >
+            Pré-visualização
+          </span>
           <span className="badge legal">Legal</span>
           <h3>
             Regime Jurídico da Cibersegurança (NIS2) — gestão de risco,
