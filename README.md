@@ -52,12 +52,18 @@ middleware.ts                  protege /feed, mantém a sessão viva
 
 ## Deploy
 
-1. Cria o repositório no GitHub, copia esta pasta inteira para lá (incluindo
-   `scripts/` e `.github/workflows/`, se já os tiveres preparado).
-2. Liga o repositório ao Vercel (import project) — deploy automático a cada
-   push, sem configuração adicional além das variáveis de ambiente.
-3. Em Vercel → Settings → Environment Variables, adiciona as mesmas duas
-   variáveis do `.env.local`.
+1. O código já está em `github.com/saramscruz/radar-oportunidades`.
+2. Liga o repositório ao **Netlify** (Add new site → Import an existing project
+   → GitHub) — deploy automático a cada `git push`. O runtime de Next.js é
+   detetado e configurado automaticamente ao encontrar o `package.json`.
+3. Em Netlify → Site settings → Environment variables, adiciona as mesmas
+   duas variáveis do `.env.local`.
+
+**Nota (30 ago. 2026):** escolhido Netlify em vez de Vercel porque o plano
+gratuito do Vercel (Hobby) proíbe uso comercial nos seus termos — qualquer
+cobrança a utilizadores exigiria o plano Pro. O plano gratuito do Netlify
+não tem essa restrição. Suporte a Server Actions e Middleware (usados
+aqui) está confirmado como completo em ambas as plataformas.
 
 ## Nota de proveniência
 
