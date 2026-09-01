@@ -21,10 +21,23 @@ export default async function SetorDetalhePage({
 
   if (!setor) notFound();
 
-  const { data: obrigacoes } = await supabase
+  const { data: obrigacoesSetor } = await supabase
     .from("obrigacoes_setores")
     .select("obrigacoes(id, titulo, fonte_url, data_entrada_vigor)")
     .eq("setor_id", params.id);
+
+  // Obrigações que não dependem do CAE (ex: whistleblowing) — mostram-se em
+  // qualquer setor, não só no(s) setor(es) ligado(s) via obrigacoes_setores.
+  const { data: obrigacoesUniversais } = await supabase
+    .from("obrigacoes")
+    .select("id, titulo, fonte_url, data_entrada_vigor")
+    .eq("aplica_a_todos_setores", true)
+    .eq("status", "ativo");
+
+  const obrigacoes = [
+    ...(obrigacoesSetor ?? []).map((o) => o.obrigacoes as any),
+    ...(obrigacoesUniversais ?? []),
+  ];
 
   const { data: fundos } = await supabase
     .from("fundos_setores")
@@ -61,23 +74,20 @@ export default async function SetorDetalhePage({
         {setor.descricao && <p className="lede">{setor.descricao}</p>}
 
         <h3 className="section-title" style={{ marginTop: 4 }}>
-          Obrigações legais ({obrigacoes?.length ?? 0})
+          Obrigações legais ({obrigacoes.length})
         </h3>
-        {(obrigacoes ?? []).length === 0 && (
+        {obrigacoes.length === 0 && (
           <p className="lede" style={{ fontSize: 13 }}>
             Nenhuma obrigação classificada para este setor até agora.
           </p>
         )}
-        {(obrigacoes ?? []).map((o) => {
-          const item = o.obrigacoes as any;
-          return (
-            <Link key={item.id} href={`/feed/obrigacao/${item.id}`} className="card">
-              <span className="badge legal">Legal</span>
-              <h3>{item.titulo}</h3>
-              <div className="meta">Entra em vigor: {item.data_entrada_vigor ?? "—"}</div>
-            </Link>
-          );
-        })}
+        {obrigacoes.map((item) => (
+          <Link key={item.id} href={`/feed/obrigacao/${item.id}`} className="card">
+            <span className="badge legal">Legal</span>
+            <h3>{item.titulo}</h3>
+            <div className="meta">Entra em vigor: {item.data_entrada_vigor ?? "—"}</div>
+          </Link>
+        ))}
 
         <h3 className="section-title">Fundos ({fundosAtivos.length})</h3>
         {fundosAtivos.length === 0 && (

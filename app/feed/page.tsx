@@ -42,10 +42,24 @@ export default async function FeedPage() {
     ? empresa.setores[0]
     : (empresa.setores as unknown as { secao_cae: string; nome_secao: string });
 
-  const { data: obrigacoes } = await supabase
+  const { data: obrigacoesSetor } = await supabase
     .from("obrigacoes_setores")
     .select("obrigacoes(id, titulo, fonte_url, data_entrada_vigor)")
     .eq("setor_id", empresa.cae_principal);
+
+  // Obrigações que não dependem do CAE (ex: whistleblowing, aplicam-se por
+  // dimensão a qualquer setor) — não ficam em obrigacoes_setores, por isso
+  // precisam de uma segunda query, combinada com a de cima.
+  const { data: obrigacoesUniversais } = await supabase
+    .from("obrigacoes")
+    .select("id, titulo, fonte_url, data_entrada_vigor")
+    .eq("aplica_a_todos_setores", true)
+    .eq("status", "ativo");
+
+  const obrigacoes = [
+    ...(obrigacoesSetor ?? []).map((o) => o.obrigacoes as any),
+    ...(obrigacoesUniversais ?? []),
+  ];
 
   const { data: fundos } = await supabase
     .from("fundos_setores")
@@ -77,24 +91,17 @@ export default async function FeedPage() {
         <p className="lede">Filtrado apenas pelo seu setor.</p>
 
         <h3 className="section-title" style={{ marginTop: 4 }}>
-          Obrigações legais ({obrigacoes?.length ?? 0})
+          Obrigações legais ({obrigacoes.length})
         </h3>
-        {(obrigacoes ?? []).map((o) => {
-          const item = o.obrigacoes as any;
-          return (
-            <Link
-              key={item.id}
-              href={`/feed/obrigacao/${item.id}`}
-              className="card"
-            >
-              <span className="badge legal">Legal</span>
-              <h3>{item.titulo}</h3>
-              <div className="meta">
-                Entra em vigor: {item.data_entrada_vigor ?? "—"}
-              </div>
-            </Link>
-          );
-        })}
+        {obrigacoes.map((item) => (
+          <Link key={item.id} href={`/feed/obrigacao/${item.id}`} className="card">
+            <span className="badge legal">Legal</span>
+            <h3>{item.titulo}</h3>
+            <div className="meta">
+              Entra em vigor: {item.data_entrada_vigor ?? "—"}
+            </div>
+          </Link>
+        ))}
 
         <h3 className="section-title">
           Fundos ({fundosAtivos.length})
