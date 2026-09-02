@@ -1,0 +1,27 @@
+name: Ingestão diária — Diário da República
+
+# Corre todos os dias úteis às 09:00 UTC — o DR publica de segunda a sexta.
+on:
+  schedule:
+    - cron: "0 9 * * 1-5"
+  workflow_dispatch: {}
+
+jobs:
+  ingerir_dre:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Correr ingestão
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python3 scripts/ingestao_diaria_dre.py
