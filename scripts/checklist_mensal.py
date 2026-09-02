@@ -3,11 +3,16 @@
 Checklist mensal de manutenção — Radar de Oportunidades.
 
 O que faz:
-1. Lista fundos ativos cuja 'data_verificacao' tem mais de 30 dias (ou nunca foi
+1. Lista fundos ativos com PRAZO A MENOS DE 30 DIAS — secção "URGENTE",
+   destacada separadamente, independentemente de quando foram verificados
+   pela última vez. Um prazo errado tem custo financeiro direto para uma
+   PME (perde a oportunidade, ou desiste cedo demais) — risco mais alto
+   do que uma obrigação legal desatualizada, daí a secção própria.
+2. Lista fundos ativos cuja 'data_verificacao' tem mais de 30 dias (ou nunca foi
    verificada) — são os candidatos a rever contra a fonte oficial este mês.
-2. Escreve um checklist em Markdown (stdout), pronto a colar num GitHub Issue
+3. Escreve um checklist em Markdown (stdout), pronto a colar num GitHub Issue
    ou a ler diretamente na consola.
-3. NÃO marca nada como revisto automaticamente — isso é sempre uma ação humana
+4. NÃO marca nada como revisto automaticamente — isso é sempre uma ação humana
    (Princípio 4 do PRD: nenhum dado entra/sai sem revisão humana).
 
 Como correr:
@@ -33,8 +38,12 @@ if not SUPABASE_URL or not SERVICE_KEY:
     print("Erro: define SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY como variáveis de ambiente.", file=sys.stderr)
     sys.exit(1)
 
-LIMIAR_DIAS = 30
-data_limite = (date.today() - timedelta(days=LIMIAR_DIAS)).isoformat()
+LIMIAR_DIAS_DESATUALIZADO = 30
+data_limite_desatualizado = (date.today() - timedelta(days=LIMIAR_DIAS_DESATUALIZADO)).isoformat()
+
+LIMIAR_DIAS_PRAZO_URGENTE = 30
+hoje_iso = date.today().isoformat()
+data_limite_prazo = (date.today() + timedelta(days=LIMIAR_DIAS_PRAZO_URGENTE)).isoformat()
 
 
 def query_supabase(table: str, params: str) -> list:
@@ -49,11 +58,23 @@ def query_supabase(table: str, params: str) -> list:
 
 
 def main():
+    # URGENTE: fundos ativos com prazo dentro de 30 dias, independentemente
+    # de quando foram verificados — verificação semanal obrigatória para
+    # estes, não só mensal (decisão de 2 set. 2026, ver PRD secção 7.4).
+    params_urgente = (
+        "select=nome,fonte_url,prazo,data_verificacao"
+        "&status=eq.ativo"
+        f"&prazo=gte.{hoje_iso}"
+        f"&prazo=lte.{data_limite_prazo}"
+        "&order=prazo.asc"
+    )
+    fundos_urgentes = query_supabase("fundos", params_urgente)
+
     # Fundos ativos com verificação desatualizada ou nunca feita.
     params = (
         "select=nome,fonte_url,prazo,data_verificacao"
         "&status=eq.ativo"
-        f"&or=(data_verificacao.is.null,data_verificacao.lt.{data_limite})"
+        f"&or=(data_verificacao.is.null,data_verificacao.lt.{data_limite_desatualizado})"
         "&order=data_verificacao.asc.nullsfirst"
     )
     fundos_a_rever = query_supabase("fundos", params)
@@ -68,7 +89,18 @@ def main():
     hoje = date.today().isoformat()
     print(f"# Checklist de manutenção mensal — {hoje}\n")
 
-    print(f"## Fundos a verificar contra a fonte oficial ({len(fundos_a_rever)})\n")
+    print(f"## 🔴 URGENTE — fundos com prazo em menos de 30 dias ({len(fundos_urgentes)})\n")
+    if not fundos_urgentes:
+        print("Nenhum fundo ativo com prazo iminente. ✅\n")
+    else:
+        print("Verificação semanal obrigatória para estes, não só mensal — um prazo "
+              "errado tem custo financeiro direto para quem se candidata.\n")
+        for f in fundos_urgentes:
+            dias_restantes = (date.fromisoformat(f["prazo"]) - date.today()).days
+            print(f"- [ ] **{f['nome']}** — prazo: {f['prazo']} ({dias_restantes} dias) "
+                  f"— última verificação: {f.get('data_verificacao') or 'nunca verificado'}\n  {f.get('fonte_url', '')}")
+
+    print(f"\n## Fundos a verificar contra a fonte oficial ({len(fundos_a_rever)})\n")
     if not fundos_a_rever:
         print("Nenhum fundo ativo com verificação desatualizada. ✅\n")
     else:
@@ -99,3 +131,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
