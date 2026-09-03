@@ -27,6 +27,7 @@ Como correr:
 """
 
 import os
+import re
 import sys
 import json
 import urllib.request
@@ -49,11 +50,22 @@ RSS_URL = "https://eur-lex.europa.eu/PT/display-feed.rss?rssId=222"
 # Orientação do BCE, retificações, regulamentos técnicos da ONU (só
 # relevantes para fabricantes automóveis, caso específico demais para
 # entrar por defeito) — só entram se também baterem numa palavra-chave.
+#
+# "Regulamento Delegado"/"Regulamento de Execução" ficam à parte (ver
+# TIPOS_SO_COM_PALAVRA_CHAVE): a primeira execução real do filtro, em
+# 3 set. 2026, mostrou 26/26 falsos positivos — quase todos eram este tipo
+# de ato (alterações técnicas estreitas a pescas, veterinária, supervisão
+# financeira, sanções), que por natureza raramente cria obrigações amplas
+# para PMEs. "Regulamento (UE)" simples e "Diretiva (UE)" continuam a
+# entrar só pelo tipo, por serem mais frequentemente enquadramentos novos.
 TIPOS_RELEVANTES = [
     "Regulamento (UE)",
+    "Diretiva (UE)",
+]
+
+TIPOS_SO_COM_PALAVRA_CHAVE = [
     "Regulamento Delegado (UE)",
     "Regulamento de Execução (UE)",
-    "Diretiva (UE)",
 ]
 
 # Mesma filosofia da lista do DR — cobre os temas já classificados mais
@@ -76,9 +88,23 @@ def normalizar(texto: str) -> str:
     return texto.lower()
 
 
+_PREFIXO_CELEX = re.compile(r"^CELEX:\S+:\s*")
+
+
+def inicio_real_do_titulo(titulo: str) -> str:
+    """Remove o prefixo 'CELEX:XXXX: ' quando existe, para isolar o início
+    real do título — é aí, e só aí, que aparece o tipo do próprio ato.
+    Sem isto, uma referência cruzada mais adiante no título (ex: "que
+    altera o Regulamento (UE) n.º 649/2012...") era apanhada por engano
+    como se fosse o tipo do ato em si — bug encontrado e corrigido em
+    3 set. 2026, na primeira execução real do filtro."""
+    return _PREFIXO_CELEX.sub("", titulo)
+
+
 def classificar_tipo(titulo: str) -> str | None:
-    for tipo in TIPOS_RELEVANTES:
-        if tipo.lower() in titulo.lower():
+    inicio = inicio_real_do_titulo(titulo).lower()
+    for tipo in TIPOS_RELEVANTES + TIPOS_SO_COM_PALAVRA_CHAVE:
+        if inicio.startswith(tipo.lower()):
             return tipo
     return None
 
@@ -138,7 +164,10 @@ def main():
         tipo = classificar_tipo(titulo)
         palavras = encontrar_palavras_chave(f"{titulo} {descricao}")
 
-        if not tipo and not palavras:
+        tipo_qualifica_sozinho = tipo in TIPOS_RELEVANTES
+        tipo_precisa_de_palavra = tipo in TIPOS_SO_COM_PALAVRA_CHAVE and bool(palavras)
+
+        if not (tipo_qualifica_sozinho or tipo_precisa_de_palavra or (not tipo and palavras)):
             ignorados += 1
             continue
 
