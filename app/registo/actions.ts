@@ -14,10 +14,14 @@ export async function registar(
   const password = String(formData.get("password") || "");
   const nif = String(formData.get("nif") || "").replace(/\s/g, "");
   const setorId = String(formData.get("setor_id") || "");
+  const concelhoId = String(formData.get("concelho_id") || "");
   const consentiu = formData.get("consentiu") === "on";
 
   if (!/^\d{9}$/.test(nif)) {
     return { erro: "Introduza um NIF com 9 dígitos." };
+  }
+  if (!concelhoId) {
+    return { erro: "Selecione o concelho." };
   }
   if (!setorId) {
     return { erro: "Selecione o setor de atividade." };
@@ -45,6 +49,7 @@ export async function registar(
   const { error: empresaError } = await supabase.from("empresas").insert({
     nif_hash: nifHash,
     cae_principal: setorId,
+    concelho_id: concelhoId,
     email_contacto: email,
     auth_user_id: authData.user.id,
     consentimento_rgpd_em: new Date().toISOString(),
