@@ -4,6 +4,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { registar, type EstadoRegisto } from "./actions";
 
 type Setor = { id: string; secao_cae: string; nome_secao: string };
+type Concelho = { id: string; nome: string; distrito: string };
 
 function BotaoSubmeter() {
   const { pending } = useFormStatus();
@@ -14,10 +15,24 @@ function BotaoSubmeter() {
   );
 }
 
-export default function RegistoForm({ setores }: { setores: Setor[] }) {
+export default function RegistoForm({
+  setores,
+  concelhos,
+}: {
+  setores: Setor[];
+  concelhos: Concelho[];
+}) {
   const [estado, formAction] = useFormState<EstadoRegisto, FormData>(
     registar,
     undefined
+  );
+
+  const concelhosPorDistrito = concelhos.reduce<Record<string, Concelho[]>>(
+    (acc, c) => {
+      (acc[c.distrito] ??= []).push(c);
+      return acc;
+    },
+    {}
   );
 
   return (
@@ -49,6 +64,24 @@ export default function RegistoForm({ setores }: { setores: Setor[] }) {
           placeholder="509 xxx xxx"
           required
         />
+      </div>
+
+      <div className="field">
+        <label htmlFor="concelho_id">Concelho</label>
+        <select id="concelho_id" name="concelho_id" required defaultValue="">
+          <option value="" disabled>
+            Selecione o concelho…
+          </option>
+          {Object.entries(concelhosPorDistrito).map(([distrito, lista]) => (
+            <optgroup key={distrito} label={distrito}>
+              {lista.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nome}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
       </div>
 
       <div className="field">
