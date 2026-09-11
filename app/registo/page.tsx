@@ -7,6 +7,11 @@ export default async function RegistoPage() {
     .from("setores")
     .select("id, secao_cae, nome_secao")
     .order("secao_cae");
+  const { data: concelhos } = await supabase
+    .from("concelhos")
+    .select("id, nome, distrito")
+    .order("distrito")
+    .order("nome");
 
   return (
     <>
@@ -29,7 +34,7 @@ export default async function RegistoPage() {
           O NIF é guardado apenas em formato de hash — nunca em texto
           simples. É usado só para identificar o registo, nunca partilhado.
         </p>
-        <RegistoForm setores={setores ?? []} />
+        <RegistoForm setores={setores ?? []} concelhos={concelhos ?? []} />
       </main>
     </>
   );
