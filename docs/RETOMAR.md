@@ -43,7 +43,7 @@ outra vez).
 - ✅ Frontend Next.js publicado no Netlify, funcional (registo → feed → detalhe)
 - ✅ Três fontes de ingestão automática a correr sozinhas: Diário da República, EUR-Lex, e o ciclo mensal de fundos
 - ✅ Obrigações classificadas com fonte primária: AI Act, RGPD, NIS2 (setorial pendente), Whistleblowing, Cyber Resilience Act
-- ✅ Cobertura de fundos do Norte 2030 iniciada (NORTE2030-2026-14/15/16 inseridos, 11 set.) — Lisboa e Alentejo ainda por reprocessar com o critério revisto (ver PRD, secção 7.2)
+- ✅ Cobertura de fundos do Norte 2030 iniciada (NORTE2030-2026-14/15/16 inseridos, 3 set.) — Lisboa e Alentejo ainda por reprocessar com o critério revisto (ver PRD, secção 7.2)
 - ⬜ **R1 — validação com contabilistas/consultores continua por fazer.** É o único risco alto do projeto ainda intocado — tudo o resto já tem engenharia sólida por trás.
 - ⬜ Consentimento (R6) implementado no código, nunca testado com alguém fora da equipa
 - ⬜ Política de privacidade formal — não escrita
